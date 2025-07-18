@@ -37,6 +37,14 @@
 #include <xrpl/protocol/TxFlags.h>
 #include <xrpl/protocol/UintTypes.h>
 
+extern "C" {
+#include "api.h"
+}
+
+#ifndef DILITHIUM_PK_SIZE
+#define DILITHIUM_PK_SIZE pqcrystals_dilithium2_PUBLICKEYBYTES 
+#endif
+
 namespace ripple {
 
 /** Performs early sanity checks on the txid */
@@ -578,6 +586,7 @@ NotTEC
 Transactor::checkSign(PreclaimContext const& ctx)
 {
     auto const pkSigner = ctx.tx.getSigningPubKey();
+    PublicKey pubKey = PublicKey(makeSlice(pkSigner));
     // Ignore signature check on batch inner transactions
     if (ctx.tx.isFlag(tfInnerBatchTxn) &&
         ctx.view.rules().enabled(featureBatch))
@@ -622,10 +631,14 @@ Transactor::checkSign(PreclaimContext const& ctx)
     }
     auto const idSigner = pkSigner.empty()
         ? idAccount
-        : calcAccountID(PublicKey(makeSlice(pkSigner)));
+        : calcAccountID(pubKey);
     auto const sleAccount = ctx.view.read(keylet::account(idAccount));
     if (!sleAccount)
         return terNO_ACCOUNT;
+
+    if (ctx.view.rules().enabled(featureQuantum) &&
+    sleAccount->isFlag(lsfForceQuantum) && pubKey.size() != DILITHIUM_PK_SIZE)
+        return telBAD_PUBLIC_KEY;
 
     return checkSingleSign(
         idSigner, idAccount, sleAccount, ctx.view.rules(), ctx.j);

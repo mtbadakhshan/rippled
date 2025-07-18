@@ -658,13 +658,30 @@ SetAccount::doApply()
         else if (uClearFlag == asfAllowTrustLineLocking)
             uFlagsOut &= ~lsfAllowTrustLineLocking;
     }
-
+    
     // Set flag for clawback
     if (ctx_.view().rules().enabled(featureClawback) &&
         uSetFlag == asfAllowTrustLineClawback)
     {
         JLOG(j_.trace()) << "set allow clawback";
         uFlagsOut |= lsfAllowTrustLineClawback;
+    }
+
+        //
+    // QuantumSignature
+    //
+    if (ctx_.view().rules().enabled(featureQuantum))
+    {
+        if (uSetFlag == asfForceQuantum)
+        {
+            JLOG(j_.trace()) << "Set lsfForceQuantum.";
+            uFlagsOut |= lsfForceQuantum;
+        }
+        else if (uClearFlag == asfForceQuantum)
+        {
+            JLOG(j_.trace()) << "Clear lsfForceQuantum.";
+            uFlagsOut &= ~lsfForceQuantum;
+        }
     }
 
     if (uFlagsIn != uFlagsOut)

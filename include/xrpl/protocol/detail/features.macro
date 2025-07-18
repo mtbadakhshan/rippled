@@ -159,3 +159,5 @@ XRPL_RETIRE(fix1201)
 XRPL_RETIRE(fix1512)
 XRPL_RETIRE(fix1523)
 XRPL_RETIRE(fix1528)
+
+XRPL_FEATURE(Quantum, Supported::yes, VoteBehavior::DefaultNo)
