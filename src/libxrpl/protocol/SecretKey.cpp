@@ -61,6 +61,11 @@
 #undef U
 #undef D
 
+extern "C" void randombytes(uint8_t *buf, size_t size) 
+{
+    beast::rngfill(buf, size, ripple::crypto_prng());
+}
+
 extern "C" {
 #include "api.h"
 #include "fips202.h"
