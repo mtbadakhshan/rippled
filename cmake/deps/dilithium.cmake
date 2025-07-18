@@ -1,5 +1,8 @@
 include(FetchContent)
 
+# Set compiler flags for the external project
+set(DILITHIUM_C_FLAGS "-Wall -Wno-array-parameter -Wmissing-prototypes -Wredundant-decls -Wshadow -Wpointer-arith -O3 -fomit-frame-pointer -std=gnu99")
+
 ExternalProject_Add(
   dilithium_src
   PREFIX ${nih_cache_path}
@@ -9,6 +12,7 @@ ExternalProject_Add(
     -DDILITHIUM_MODE=2 
     -DDILITHIUM_RANDOMIZED_SIGNING=ON 
     -DDILITHIUM_USE_AES=ON
+    -DCMAKE_C_FLAGS=${DILITHIUM_C_FLAGS}
   LOG_BUILD ON
   LOG_CONFIGURE ON
   COMMAND
