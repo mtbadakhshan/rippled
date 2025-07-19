@@ -257,6 +257,7 @@ TYPED_SFIELD(sfCreateCode,               VL,        11)
 TYPED_SFIELD(sfMemoType,                 VL,        12)
 TYPED_SFIELD(sfMemoData,                 VL,        13)
 TYPED_SFIELD(sfMemoFormat,               VL,        14)
+TYPED_SFIELD(sfQuantumPublicKey,         VL,        19)
 
 // variable length (uncommon)
 TYPED_SFIELD(sfFulfillment,              VL,        16)

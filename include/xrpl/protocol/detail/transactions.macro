@@ -556,3 +556,8 @@ TRANSACTION(ttUNL_MODIFY, 102, UNLModify, Delegation::notDelegatable, ({
     {sfLedgerSequence, soeREQUIRED},
     {sfUNLModifyValidator, soeREQUIRED},
 }))
+
+/** This transaction type is for SetQuantumKey. */
+TRANSACTION(ttSET_QUANTUM_KEY, 32, SetQuantumKey, Delegation::notDelegatable, ({
+    {sfQuantumPublicKey, soeREQUIRED},
+}))

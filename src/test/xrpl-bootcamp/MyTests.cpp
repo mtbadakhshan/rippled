@@ -54,11 +54,44 @@ class MyTests_test: public beast::unit_test::suite
 
 
     void
+    testQuantum(FeatureBitset features)
+    {
+        using namespace test::jtx;
+
+        testcase("quantum");
+
+        Env env{*this, envconfig(), features};
+        Account const alice{"alice"};
+        Account const bob{"bob"};
+        Account const carol{"carol"};
+        Account const dave{"dave", KeyType::dilithium};
+        env.fund(XRP(1000), alice, bob, carol, dave);
+        env.close();
+
+        Json::Value jv;
+        jv[sfAccount.jsonName] = alice.human();
+        jv[sfQuantumPublicKey.jsonName] = strHex(dave.pk().slice());
+        jv[sfTransactionType.jsonName] = jss::SetQuantumKey;
+
+        env(jv);
+        env.close();
+
+        // Json::Value params;
+        // params[jss::ledger_index] = env.current()->seq() - 1;
+        // params[jss::transactions] = true;
+        // params[jss::expand] = true;
+        // auto const jrr = env.rpc("json", "ledger", to_string(params));
+        // std::cout << jrr << std::endl;
+    } 
+
+
+    void
     run() override
     {
         using namespace jtx;
 
-        testSignatures(FeatureBitset{});
+        // testSignatures(FeatureBitset{});
+        testQuantum(FeatureBitset{});
     }
 };
 BEAST_DEFINE_TESTSUITE(MyTests, bootcamp, ripple);
