@@ -561,7 +561,7 @@ TRANSACTION(ttUNL_MODIFY, 102, UNLModify, Delegation::notDelegatable, ({
 /* For recurring-payment -----------------------------------*/
 
 // RecurringPaymentSet
-TRANSACTION(RecurringPaymentSet, 103, RecurringPaymentSet, Delegation::delegatable, ({
+TRANSACTION(ttRecurringPaymentSet, 103, RecurringPaymentSet, Delegation::delegatable, ({
     {sfAccount,             soeREQUIRED},
     {sfDestination,         soeREQUIRED},
     {sfDestinationTag,      soeOPTIONAL},
@@ -575,7 +575,7 @@ TRANSACTION(RecurringPaymentSet, 103, RecurringPaymentSet, Delegation::delegatab
 }))
 
 // RecurringPaymentLock
-TRANSACTION(RecurringPaymentLock, 104, RecurringPaymentSet, Delegation::delegatable, ({
+TRANSACTION(ttRecurringPaymentLock, 104, RecurringPaymentLock, Delegation::delegatable, ({
     {sfTransactionType,     soeREQUIRED},
     {sfAccount,             soeREQUIRED},
     {sfRecurringPaymentID,  soeREQUIRED},
@@ -584,15 +584,7 @@ TRANSACTION(RecurringPaymentLock, 104, RecurringPaymentSet, Delegation::delegata
 
 
 // RecurringPaymentUnlock
-TRANSACTION(RecurringPaymentUnlock, 104, RecurringPaymentSet, Delegation::delegatable, ({
-    {sfTransactionType,     soeREQUIRED},
-    {sfAccount,             soeREQUIRED},
-    {sfRecurringPaymentID,  soeREQUIRED},
-    {sfAmount,              soeREQUIRED},
-}))
-
-// RecurringPaymentUnlock
-TRANSACTION(RecurringPaymentUnlock, 104, RecurringPaymentSet, Delegation::delegatable, ({
+TRANSACTION(ttRecurringPaymentUnlock, 105, RecurringPaymentUnlock, Delegation::delegatable, ({
     {sfTransactionType,     soeREQUIRED},
     {sfAccount,             soeREQUIRED},
     {sfRecurringPaymentID,  soeREQUIRED},
@@ -600,14 +592,14 @@ TRANSACTION(RecurringPaymentUnlock, 104, RecurringPaymentSet, Delegation::delega
 }))
 
 // RecurringPaymentCancel
-TRANSACTION(RecurringPaymentCancel, 105, RecurringPaymentSet, Delegation::delegatable, ({
+TRANSACTION(ttRecurringPaymentCancel, 106, RecurringPaymentCancel, Delegation::delegatable, ({
     {sfTransactionType,     soeREQUIRED},
     {sfAccount,             soeREQUIRED},
     {sfRecurringPaymentID,  soeREQUIRED},
 }))
 
 // RecurringPaymentClaim
-TRANSACTION(RecurringPaymentClaim, 106, RecurringPaymentSet, Delegation::delegatable, ({
+TRANSACTION(ttRecurringPaymentClaim, 107, RecurringPaymentClaim, Delegation::delegatable, ({
     {sfTransactionType,     soeREQUIRED},
     {sfAccount,             soeREQUIRED},
     {sfRecurringPaymentID,  soeREQUIRED},

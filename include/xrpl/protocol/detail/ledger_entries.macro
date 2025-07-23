@@ -506,8 +506,9 @@ LEDGER_ENTRY(ltVAULT, 0x0084, Vault, vault, ({
 
 
 /** A ledger object representing Recurring Payment Authorizations (RPA).
+    keylet::recurring_payment
  */
- LEDGER_ENTRY(ltRecurringPayment, 0x0085, RecurringPayment, recurring_payment, ({
+ LEDGER_ENTRY(ltRECURRINGPAYMENT, 0x0085, RecurringPayment, recurring_payment, ({
     {sfAccount,              soeREQUIRED},
     {sfOwnerNode,            soeREQUIRED},
     {sfSequence,             soeREQUIRED},

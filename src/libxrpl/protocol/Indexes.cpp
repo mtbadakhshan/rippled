@@ -96,6 +96,7 @@ enum class LedgerNameSpace : std::uint16_t {
     PERMISSIONED_DOMAIN = 'm',
     DELEGATE = 'E',
     VAULT = 'V',
+    RECURRING_PAYMENT = 'X',
 
     // No longer used or supported. Left here to reserve the space
     // to avoid accidental reuse.
@@ -573,6 +574,21 @@ permissionedDomain(AccountID const& account, std::uint32_t seq) noexcept
         ltPERMISSIONED_DOMAIN,
         indexHash(LedgerNameSpace::PERMISSIONED_DOMAIN, account, seq)};
 }
+
+Keylet
+recurringPayment(AccountID const& account, AccountID const& destination, std::uint32_t seq) noexcept
+{
+    return {
+        ltRECURRINGPAYMENT,
+        indexHash(LedgerNameSpace::RECURRING_PAYMENT, account, destination, seq)};
+}
+
+Keylet
+recurringPayment(uint256 const& recurringPaymentID) noexcept
+{
+    return {ltRECURRINGPAYMENT, recurringPaymentID};
+}
+
 
 Keylet
 permissionedDomain(uint256 const& domainID) noexcept
