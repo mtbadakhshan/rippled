@@ -504,6 +504,25 @@ LEDGER_ENTRY(ltVAULT, 0x0084, Vault, vault, ({
     // no PermissionedDomainID ever (use MPTIssuance.sfDomainID)
 }))
 
+
+/** A ledger object representing Recurring Payment Authorizations (RPA).
+ */
+ LEDGER_ENTRY(ltRecurringPayment, 0x0085, RecurringPayment, recurring_payment, ({
+    {sfAccount,              soeREQUIRED},
+    {sfOwnerNode,            soeREQUIRED},
+    {sfSequence,             soeREQUIRED},
+    {sfDestination,          soeOPTIONAL},
+    {sfDestinationTag,       soeOPTIONAL},
+    {sfAmount,               soeREQUIRED},
+    {sfFrequency,            soeREQUIRED},
+    {sfNextResetTime,        soeREQUIRED},
+    {sfExpiration,           soeOPTIONAL},
+    {sfClaimedThisPeriod,    soeREQUIRED},
+    {sfLockedFunds,          soeREQUIRED},
+    {sfPublicKey,            soeOPTIONAL},
+    {sfFlags,                soeOPTIONAL},
+}))
+
 #undef EXPAND
 #undef LEDGER_ENTRY_DUPLICATE
 

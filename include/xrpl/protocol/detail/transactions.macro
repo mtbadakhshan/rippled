@@ -556,3 +556,63 @@ TRANSACTION(ttUNL_MODIFY, 102, UNLModify, Delegation::notDelegatable, ({
     {sfLedgerSequence, soeREQUIRED},
     {sfUNLModifyValidator, soeREQUIRED},
 }))
+
+
+/* For recurring-payment -----------------------------------*/
+
+// RecurringPaymentSet
+TRANSACTION(RecurringPaymentSet, 103, RecurringPaymentSet, Delegation::delegatable, ({
+    {sfAccount,             soeREQUIRED},
+    {sfDestination,         soeREQUIRED},
+    {sfDestinationTag,      soeOPTIONAL},
+    {sfAmount,              soeREQUIRED},
+    {sfFrequency,           soeREQUIRED},
+    {sfStartTime,           soeOPTIONAL},
+    {sfExpiration,          soeOPTIONAL},
+    {sfRecurringPaymentID,  soeOPTIONAL},
+    {sfPublicKey,           soeOPTIONAL},
+    {sfFlags,               soeOPTIONAL},
+}))
+
+// RecurringPaymentLock
+TRANSACTION(RecurringPaymentLock, 104, RecurringPaymentSet, Delegation::delegatable, ({
+    {sfTransactionType,     soeREQUIRED},
+    {sfAccount,             soeREQUIRED},
+    {sfRecurringPaymentID,  soeREQUIRED},
+    {sfAmount,              soeREQUIRED},
+}))
+
+
+// RecurringPaymentUnlock
+TRANSACTION(RecurringPaymentUnlock, 104, RecurringPaymentSet, Delegation::delegatable, ({
+    {sfTransactionType,     soeREQUIRED},
+    {sfAccount,             soeREQUIRED},
+    {sfRecurringPaymentID,  soeREQUIRED},
+    {sfAmount,              soeREQUIRED},
+}))
+
+// RecurringPaymentUnlock
+TRANSACTION(RecurringPaymentUnlock, 104, RecurringPaymentSet, Delegation::delegatable, ({
+    {sfTransactionType,     soeREQUIRED},
+    {sfAccount,             soeREQUIRED},
+    {sfRecurringPaymentID,  soeREQUIRED},
+    {sfAmount,              soeREQUIRED},
+}))
+
+// RecurringPaymentCancel
+TRANSACTION(RecurringPaymentCancel, 105, RecurringPaymentSet, Delegation::delegatable, ({
+    {sfTransactionType,     soeREQUIRED},
+    {sfAccount,             soeREQUIRED},
+    {sfRecurringPaymentID,  soeREQUIRED},
+}))
+
+// RecurringPaymentClaim
+TRANSACTION(RecurringPaymentClaim, 106, RecurringPaymentSet, Delegation::delegatable, ({
+    {sfTransactionType,     soeREQUIRED},
+    {sfAccount,             soeREQUIRED},
+    {sfRecurringPaymentID,  soeREQUIRED},
+    {sfAmount,              soeREQUIRED},
+    {sfDestination,         soeOPTIONAL},
+    {sfSignature,           soeOPTIONAL},
+}))
+
