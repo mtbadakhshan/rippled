@@ -558,11 +558,14 @@ TRANSACTION(ttUNL_MODIFY, 102, UNLModify, Delegation::notDelegatable, ({
 }))
 
 
-/* For recurring-payment -----------------------------------*/
+/* For recurring-payment -----------------------------------
+sfTransactionType, sfAccount, and sfFlags are defined in 
+static std::initializer_list<SOElement> const commonFields
+at src/libxrpl/protocol/TxFormats.cpp
+*/
 
 // RecurringPaymentSet
 TRANSACTION(ttRecurringPaymentSet, 103, RecurringPaymentSet, Delegation::delegatable, ({
-    {sfAccount,             soeREQUIRED},
     {sfDestination,         soeREQUIRED},
     {sfDestinationTag,      soeOPTIONAL},
     {sfAmount,              soeREQUIRED},
@@ -571,13 +574,10 @@ TRANSACTION(ttRecurringPaymentSet, 103, RecurringPaymentSet, Delegation::delegat
     {sfExpiration,          soeOPTIONAL},
     {sfRecurringPaymentID,  soeOPTIONAL},
     {sfPublicKey,           soeOPTIONAL},
-    {sfFlags,               soeOPTIONAL},
 }))
 
 // RecurringPaymentLock
 TRANSACTION(ttRecurringPaymentLock, 104, RecurringPaymentLock, Delegation::delegatable, ({
-    {sfTransactionType,     soeREQUIRED},
-    {sfAccount,             soeREQUIRED},
     {sfRecurringPaymentID,  soeREQUIRED},
     {sfAmount,              soeREQUIRED},
 }))
@@ -585,23 +585,17 @@ TRANSACTION(ttRecurringPaymentLock, 104, RecurringPaymentLock, Delegation::deleg
 
 // RecurringPaymentUnlock
 TRANSACTION(ttRecurringPaymentUnlock, 105, RecurringPaymentUnlock, Delegation::delegatable, ({
-    {sfTransactionType,     soeREQUIRED},
-    {sfAccount,             soeREQUIRED},
     {sfRecurringPaymentID,  soeREQUIRED},
     {sfAmount,              soeREQUIRED},
 }))
 
 // RecurringPaymentCancel
 TRANSACTION(ttRecurringPaymentCancel, 106, RecurringPaymentCancel, Delegation::delegatable, ({
-    {sfTransactionType,     soeREQUIRED},
-    {sfAccount,             soeREQUIRED},
     {sfRecurringPaymentID,  soeREQUIRED},
 }))
 
 // RecurringPaymentClaim
 TRANSACTION(ttRecurringPaymentClaim, 107, RecurringPaymentClaim, Delegation::delegatable, ({
-    {sfTransactionType,     soeREQUIRED},
-    {sfAccount,             soeREQUIRED},
     {sfRecurringPaymentID,  soeREQUIRED},
     {sfAmount,              soeREQUIRED},
     {sfDestination,         soeOPTIONAL},

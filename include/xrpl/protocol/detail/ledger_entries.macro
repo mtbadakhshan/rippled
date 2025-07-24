@@ -513,6 +513,7 @@ LEDGER_ENTRY(ltVAULT, 0x0084, Vault, vault, ({
     {sfOwnerNode,            soeREQUIRED},
     {sfSequence,             soeREQUIRED},
     {sfDestination,          soeOPTIONAL},
+    {sfDestinationNode,      soeOPTIONAL},
     {sfDestinationTag,       soeOPTIONAL},
     {sfAmount,               soeREQUIRED},
     {sfFrequency,            soeREQUIRED},
@@ -521,7 +522,6 @@ LEDGER_ENTRY(ltVAULT, 0x0084, Vault, vault, ({
     {sfClaimedThisPeriod,    soeREQUIRED},
     {sfLockedFunds,          soeREQUIRED},
     {sfPublicKey,            soeOPTIONAL},
-    {sfFlags,                soeOPTIONAL},
 }))
 
 #undef EXPAND

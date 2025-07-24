@@ -165,9 +165,9 @@ RecurringPaymentSet::doApply()
         if (ctx_.tx.isFieldPresent(sfDestination))
             sle->setAccountID(sfDestination, ctx_.tx.getAccountID(sfDestination));
         if (ctx_.tx.isFieldPresent(sfStartTime))
-            sle->setFieldU32(sfStartTime, ctx_.tx.getFieldU64(sfStartTime));
+            sle->setFieldU32(sfStartTime, ctx_.tx.getFieldU32(sfStartTime));
         if (ctx_.tx.isFieldPresent(sfExpiration))
-            sle->setFieldU32(sfExpiration, ctx_.tx.getFieldU64(sfExpiration));
+            sle->setFieldU32(sfExpiration, ctx_.tx.getFieldU32(sfExpiration));
         
         sle->setFieldAmount(sfClaimedThisPeriod, XRPAmount(0));
         if (ctx_.tx.isFieldPresent(sfStartTime))

@@ -61,6 +61,17 @@ RecurringPaymentLock::preclaim(PreclaimContext const& ctx)
 TER
 RecurringPaymentLock::doApply()
 {
+
+    auto amount = ctx_.tx.getFieldAmount(sfAmount);
+
+    auto const sle = ctx_.view().peek(keylet::recurringPayment(ctx_.tx.getFieldH256(sfRecurringPaymentID)));
+
+    auto prev_lock_funds =  sle->getFieldAmount(sfLockedFunds);
+    auto new_lock_funds = prev_lock_funds + amount;
+    sle->setFieldAmount(sfLockedFunds, new_lock_funds);
+
+    ctx_.view().insert(sle);
+
     return tesSUCCESS;
 }
 
