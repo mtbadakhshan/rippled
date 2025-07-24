@@ -61,6 +61,26 @@ RecurringPaymentCancel::preclaim(PreclaimContext const& ctx)
 TER
 RecurringPaymentCancel::doApply()
 {
+    if (!ctx_.tx.isFieldPresent(sfRecurringPaymentID))
+    {
+        JLOG(ctx_.journal.error()) << "RecurringPaymentCancel: RecurringPaymentID is not present";
+        return temMALFORMED;
+    }
+
+    auto const sle = ctx_.view().peek(keylet::recurringPayment(ctx_.tx.getFieldH256(sfRecurringPaymentID)));
+    if (!sle)
+    {
+        JLOG(ctx_.journal.error()) << "RecurringPaymentCancel: Recurring payment not found";
+        return tecNO_TARGET;
+    }
+
+    auto const sleAccount = ctx_.view().peek(keylet::account(ctx_.tx.getAccountID(sfAccount)));
+    sleAccount->setFieldAmount(sfBalance, sleAccount->getFieldAmount(sfBalance) + sle->getFieldAmount(sfLockedFunds));
+
+    sle->setFieldAmount(sfLockedFunds, XRPAmount(0));
+
+    ctx_.view().erase(sle);
+
     return tesSUCCESS;
 }
 

@@ -55,6 +55,32 @@ RecurringPaymentLock::checkPermission(ReadView const& view, STTx const& tx)
 TER
 RecurringPaymentLock::preclaim(PreclaimContext const& ctx)
 {
+
+   // Check if the recurring payment exists 
+    auto const sle = ctx.view.read(keylet::recurringPayment(ctx.tx.getFieldH256(sfRecurringPaymentID)));
+    if (!sle)
+    {
+        JLOG(ctx.j.error()) << "RecurringPaymentLock: Recurring payment not found";
+        return tecNO_TARGET;
+    }
+
+    // Check if the account has sufficient funds to lock
+    auto const account = ctx.tx.getAccountID(sfAccount);
+    auto const sleAccount = ctx.view.read(keylet::account(account));
+    if (!sleAccount)
+    {
+        JLOG(ctx.j.error()) << "RecurringPaymentLock: Account not found";
+        return tefINTERNAL;
+    } 
+    auto const amount = ctx.tx.getFieldAmount(sfAmount);
+    if (sleAccount->getFieldAmount(sfBalance) < amount)
+    {   
+        JLOG(ctx.j.error()) << "RecurringPaymentLock: Insufficient funds in account: "<< sleAccount->getFieldAmount(sfBalance) 
+                            << "balance to lock: " << amount;
+        return tecINSUFFICIENT_FUNDS;
+    } 
+    
+
     return tesSUCCESS;
 }
 
@@ -63,15 +89,17 @@ RecurringPaymentLock::doApply()
 {
 
     auto amount = ctx_.tx.getFieldAmount(sfAmount);
-
     auto const sle = ctx_.view().peek(keylet::recurringPayment(ctx_.tx.getFieldH256(sfRecurringPaymentID)));
-
     auto prev_lock_funds =  sle->getFieldAmount(sfLockedFunds);
     auto new_lock_funds = prev_lock_funds + amount;
     sle->setFieldAmount(sfLockedFunds, new_lock_funds);
 
-    ctx_.view().insert(sle);
+    // auto account = ctx_.tx.getAccountID(sfAccount);
+    auto const sleAccount = ctx_.view().peek(keylet::account(ctx_.tx.getAccountID(sfAccount)));
+    sleAccount->setFieldAmount(sfBalance, sleAccount->getFieldAmount(sfBalance) - amount);
 
+
+    ctx_.view().update(sle);
     return tesSUCCESS;
 }
 

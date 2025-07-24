@@ -60,6 +60,13 @@ RecurringPaymentClaim::preclaim(PreclaimContext const& ctx)
         JLOG(ctx.j.error()) << "RecurringPaymentClaim: Recurring payment not found";
         return tecNO_TARGET;
     }
+
+    // - `sfDestination`: The accound does not match the SLE destination
+    if (ctx.tx.getAccountID(sfAccount) != sle->getAccountID(sfDestination))
+    {
+        JLOG(ctx.j.error()) << "RecurringPaymentClaim: The account does not match the SLE destination";
+        return tecNO_PERMISSION;
+    }
     
     // - `sfDestination`: The intended recipient.
     if (ctx.tx.getAccountID(sfDestination) != sle->getAccountID(sfDestination))
@@ -167,18 +174,18 @@ RecurringPaymentClaim::doApply()
     sle->setFieldAmount(sfClaimedThisPeriod, sle->getFieldAmount(sfClaimedThisPeriod) + claimAmount);
 
     // Deduct the claimed amount from the locked funds
-    // STAmount const lockedAmount = sle->getFieldAmount(sfLockedAmount);
-    // if (lockedAmount < claimAmount)
-    // {
-    //     JLOG(ctx_.journal.error()) << "RecurringPaymentClaim: Insufficient locked funds";
-    //     return tecINSUFFICIENT_FUNDS;
-    // }
-    // sle->setFieldAmount(sfLockedAmount, lockedAmount - claimAmount);
+    STAmount const lockedAmount = sle->getFieldAmount(sfLockedFunds);
+    if (lockedAmount < claimAmount)
+    {
+        JLOG(ctx_.journal.error()) << "RecurringPaymentClaim: Insufficient locked funds";
+        return tecINSUFFICIENT_FUNDS;
+    }
+    sle->setFieldAmount(sfLockedFunds, lockedAmount - claimAmount);
 
     // Credit the destination account
     (*sled)[sfBalance] = (*sled)[sfBalance] + claimAmount;
     // Debit the source account
-    (*slea)[sfBalance] = (*slea)[sfBalance] - claimAmount;
+    // (*slea)[sfBalance] = (*slea)[sfBalance] - claimAmount;
     // update the view
     ctx_.view().update(sle);
     ctx_.view().update(sled);

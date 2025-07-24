@@ -65,6 +65,36 @@ public:
     }
 
     Json::Value
+    lock(
+        jtx::Account const& account, 
+        STAmount const& amount,
+        uint256 const& id)
+    {
+        using namespace jtx;
+        Json::Value jv;
+        jv[jss::TransactionType] = jss::RecurringPaymentLock;
+        jv[jss::Account] = to_string(account.id());
+        jv[jss::Amount] = amount.getJson(JsonOptions::none);
+        jv[sfRecurringPaymentID] = to_string(id);
+        return jv;
+    }
+
+    Json::Value
+    unlock(
+        jtx::Account const& account, 
+        STAmount const& amount,
+        uint256 const& id)
+    {
+        using namespace jtx;
+        Json::Value jv;
+        jv[jss::TransactionType] = jss::RecurringPaymentUnlock;
+        jv[jss::Account] = to_string(account.id());
+        jv[jss::Amount] = amount.getJson(JsonOptions::none);
+        jv[sfRecurringPaymentID] = to_string(id);
+        return jv;
+    }
+
+    Json::Value
     cancel(
         jtx::Account const& account, 
         uint256 const& id)
@@ -77,6 +107,7 @@ public:
         return jv;
     }
 
+    // TODO: The destination field is redundant in the claim transaction. As the account should match the destination in the recurring payment.
     Json::Value
     claim(
         jtx::Account const& account,
@@ -130,9 +161,10 @@ public:
         Env env(*this);
         Account const alice = Account{"alice"};
         Account const bob = Account{"bob"};
-        env.fund(XRP(10000), bob, alice);
+        env.fund(XRP(1000), bob, alice);
         env.close();
 
+        //////////////////// Set
         // Using Destination
         auto const id = recurringPaymentID(alice.id(), bob.id(), env.seq(alice));
         auto const frequency = 100s;
@@ -148,8 +180,32 @@ public:
             std::cout << jrr << std::endl;
         }
 
-        env(claim(alice, bob, id, XRP(1)), ter(tesSUCCESS));
-        env(claim(alice, bob, id, XRP(10)), ter(tecINSUFFICIENT_FUNDS));
+        //////////////////// 
+        
+        // Claiming before locking should fail
+        std::cout << "Claiming before locking should fail" << std::endl;
+        env(claim(bob, bob, id, XRP(1)), ter(tecINSUFFICIENT_FUNDS));
+        // Locking
+        std::cout << "Locking 500 XRP" << std::endl;
+        env(lock(alice, XRP(500), id), ter(tesSUCCESS));
+
+        // Locking another 500 should fail because the total locked amount exceeds the balance
+        std::cout << "Locking another 500 XRP should fail" << std::endl;
+        env(lock(alice, XRP(500), id), ter(tecINSUFFICIENT_FUNDS));
+
+        env.close();
+        {
+            Json::Value params;
+            params[jss::ledger_index] = env.current()->seq() - 1;
+            params[jss::transactions] = true;
+            params[jss::expand] = true;
+            auto const jrr = env.rpc("json", "ledger", to_string(params));
+            std::cout << jrr << std::endl;
+        }
+
+        env(claim(alice, bob, id, XRP(1)), ter(tecNO_PERMISSION)); // Unauthorized claim should fail
+        env(claim(bob, bob, id, XRP(1)), ter(tesSUCCESS));
+        env(claim(bob, bob, id, XRP(10)), ter(tecINSUFFICIENT_FUNDS)); // Claiming more than the set amount should fail (it is still more than the locked funds)
         env.close();
 
         {
@@ -160,6 +216,21 @@ public:
             auto const jrr = env.rpc("json", "ledger", to_string(params));
             std::cout << jrr << std::endl;
         }
+
+        env(unlock(bob, XRP(1), id), ter(tecNO_PERMISSION)); //Unauthorized unlock should fail
+        env(unlock(alice, XRP(500), id), ter(tecINSUFFICIENT_FUNDS)); // Unlocking more than the locked amount should fail
+        env(unlock(alice, XRP(120), id), ter(tesSUCCESS)); // Unlocking 100 XRP should succeed (there should be 499 XRP left locked)
+        env.close();
+
+        {
+            Json::Value params;
+            params[jss::ledger_index] = env.current()->seq() - 1;
+            params[jss::transactions] = true;
+            params[jss::expand] = true;
+            auto const jrr = env.rpc("json", "ledger", to_string(params));
+            std::cout << jrr << std::endl;
+        }
+
     }
 
     void

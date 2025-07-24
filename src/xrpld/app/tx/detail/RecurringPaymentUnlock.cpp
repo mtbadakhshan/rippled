@@ -55,12 +55,53 @@ RecurringPaymentUnlock::checkPermission(ReadView const& view, STTx const& tx)
 TER
 RecurringPaymentUnlock::preclaim(PreclaimContext const& ctx)
 {
+    
+    auto amount = ctx.tx.getFieldAmount(sfAmount);
+    auto account = ctx.tx.getAccountID(sfAccount);
+    auto const sle = ctx.view.read(keylet::recurringPayment(ctx.tx.getFieldH256(sfRecurringPaymentID)));
+    if (!sle)
+    {
+        JLOG(ctx.j.error()) << "RecurringPaymentUnlock: Recurring payment not found";
+        return tecNO_TARGET;
+    }
+
+    if (sle->getAccountID(sfAccount) != account)
+    {
+        JLOG(ctx.j.error()) << "RecurringPaymentUnlock: Account does not match the recurring payment";
+        return tecNO_PERMISSION;
+    }
+    
+    if( sle->getFieldAmount(sfLockedFunds) < amount)
+    {
+        JLOG(ctx.j.error()) << "RecurringPaymentUnlock: Insufficient locked funds";
+        return tecINSUFFICIENT_FUNDS;
+    }
+
+
     return tesSUCCESS;
 }
 
 TER
 RecurringPaymentUnlock::doApply()
 {
+    auto amount = ctx_.tx.getFieldAmount(sfAmount);
+    auto const sle = ctx_.view().peek(keylet::recurringPayment(ctx_.tx.getFieldH256(sfRecurringPaymentID)));
+    auto prev_lock_funds =  sle->getFieldAmount(sfLockedFunds);
+    if (prev_lock_funds < amount)
+    {
+        JLOG(ctx_.journal.error()) << "RecurringPaymentUnlock: Insufficient locked funds";
+        return tecINSUFFICIENT_FUNDS;
+    }
+    // Deduct the specified amount from the locked funds
+    auto new_lock_funds = prev_lock_funds - amount;
+    sle->setFieldAmount(sfLockedFunds, new_lock_funds);
+
+    // Update the acount balance
+    auto account = ctx_.tx.getAccountID(sfAccount);
+    auto const sleAccount = ctx_.view().peek(keylet::account(ctx_.tx.getAccountID(sfAccount)));
+    sleAccount->setFieldAmount(sfBalance, sleAccount->getFieldAmount(sfBalance) + amount);
+
+    ctx_.view().update(sle);
     return tesSUCCESS;
 }
 

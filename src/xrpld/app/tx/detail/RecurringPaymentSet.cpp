@@ -161,6 +161,7 @@ RecurringPaymentSet::doApply()
         auto const sle = std::make_shared<SLE>(keylet);
         sle->setAccountID(sfAccount, ctx_.tx.getAccountID(sfAccount));
         sle->setFieldAmount(sfAmount, ctx_.tx.getFieldAmount(sfAmount));
+        sle->setFieldAmount(sfLockedFunds, XRPAmount(0));
         sle->setFieldU64(sfFrequency, ctx_.tx.getFieldU64(sfFrequency));
         if (ctx_.tx.isFieldPresent(sfDestination))
             sle->setAccountID(sfDestination, ctx_.tx.getAccountID(sfDestination));
@@ -175,7 +176,7 @@ RecurringPaymentSet::doApply()
         else
             sle->setFieldU32(sfNextResetTime, ctx_.view().parentCloseTime().time_since_epoch().count() + ctx_.tx.getFieldU64(sfFrequency));
         
-        ctx_.view().insert(sle);
+        ctx_.view().insert(sle);   
 
         // add to owner directory
         {
