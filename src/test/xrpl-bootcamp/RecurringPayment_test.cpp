@@ -207,6 +207,7 @@ public:
         env(claim(bob, bob, id, XRP(1)), ter(tesSUCCESS));
         env(claim(bob, bob, id, XRP(10)), ter(tecINSUFFICIENT_FUNDS)); // Claiming more than the set amount should fail (it is still more than the locked funds)
         env.close();
+        
 
         {
             Json::Value params;
@@ -216,7 +217,20 @@ public:
             auto const jrr = env.rpc("json", "ledger", to_string(params));
             std::cout << jrr << std::endl;
         }
+        
+        env(claim(bob, bob, id, XRP(10)), ter(tecINSUFFICIENT_FUNDS)); // Claiming more than the set amount should fail before the frequency period ends
+        env.close(env.now() + frequency);
+        env(claim(bob, bob, id, XRP(10)), ter(tesSUCCESS)); // Caiming after the frequency period should succeed
 
+        {
+            Json::Value params;
+            params[jss::ledger_index] = env.current()->seq() - 1;
+            params[jss::transactions] = true;
+            params[jss::expand] = true;
+            auto const jrr = env.rpc("json", "ledger", to_string(params));
+            std::cout << jrr << std::endl;
+        }
+        /* Considering delay for unlock to prevent "Race condition" */
         env(unlock(bob, XRP(1), id), ter(tecNO_PERMISSION)); //Unauthorized unlock should fail
         env(unlock(alice, XRP(500), id), ter(tecINSUFFICIENT_FUNDS)); // Unlocking more than the locked amount should fail
         env(unlock(alice, XRP(120), id), ter(tesSUCCESS)); // Unlocking 100 XRP should succeed (there should be 499 XRP left locked)
@@ -230,6 +244,12 @@ public:
             auto const jrr = env.rpc("json", "ledger", to_string(params));
             std::cout << jrr << std::endl;
         }
+
+
+        env(cancel(alice, id), ter(tesSUCCESS)); // Canceling the recurring payment should succeed
+        env.close();    
+
+
 
     }
 

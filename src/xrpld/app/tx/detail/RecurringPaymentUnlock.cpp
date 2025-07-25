@@ -97,7 +97,7 @@ RecurringPaymentUnlock::doApply()
     sle->setFieldAmount(sfLockedFunds, new_lock_funds);
 
     // Update the acount balance
-    auto account = ctx_.tx.getAccountID(sfAccount);
+    // auto account = ctx_.tx.getAccountID(sfAccount);
     auto const sleAccount = ctx_.view().peek(keylet::account(ctx_.tx.getAccountID(sfAccount)));
     sleAccount->setFieldAmount(sfBalance, sleAccount->getFieldAmount(sfBalance) + amount);
 

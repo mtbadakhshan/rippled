@@ -97,6 +97,7 @@ RecurringPaymentLock::doApply()
     // auto account = ctx_.tx.getAccountID(sfAccount);
     auto const sleAccount = ctx_.view().peek(keylet::account(ctx_.tx.getAccountID(sfAccount)));
     sleAccount->setFieldAmount(sfBalance, sleAccount->getFieldAmount(sfBalance) - amount);
+    ctx_.view().update(sleAccount); // Best Practice: Always update the account SLE after modifying it
 
 
     ctx_.view().update(sle);
